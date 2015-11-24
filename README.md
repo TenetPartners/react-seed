@@ -1,3 +1,5 @@
+[![devDependency Status](https://david-dm.org/TenetPartners/react-seed/dev-status.svg)](https://david-dm.org/TenetPartners/react-seed#info=devDependencies)
+
 # react-seed
 
 A set of packages and build scripts to enable test driven development for React apps in ES6.
