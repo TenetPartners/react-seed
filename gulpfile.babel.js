@@ -1,9 +1,13 @@
+const TEST_FILES = 'scripts/**/__tests__/**/*.js';
+const SRC_FILES = 'scripts/**/*.js';
+const BABEL_PRESETS = ["stage-0", "es2015", "react"];
+
 import gulp from 'gulp'
 import source from 'vinyl-source-stream'
 import gutil from 'gulp-util'
 import browserify from 'browserify'
 import babel from 'babel-core/register'
-babel({ presets: ["stage-0", "es2015", "react"] })
+babel({ presets: BABEL_PRESETS })
 import babelify from 'babelify'
 import watchify from 'watchify'
 import notify from 'gulp-notify'
@@ -23,10 +27,6 @@ import istanbul from 'gulp-istanbul'
 import { Instrumenter } from 'isparta'
 import runSequence from 'run-sequence'
 
-// Files to process
-let TEST_FILES = 'scripts/**/__tests__/**/*.js';
-let SRC_FILES = 'scripts/**/*.js';
-
 function handleErrors() {
   var args = Array.prototype.slice.call(arguments);
   notify.onError({
@@ -40,7 +40,7 @@ function buildScript(file, watch) {
   var props = {
     entries: ['./scripts/' + file],
     debug : true,
-    transform:  [babelify.configure({presets: ["stage-0", "es2015", "react"]})]
+    transform:  [babelify.configure({presets: BABEL_PRESETS})]
   };
 
   // watchify() if watch requested, otherwise run browserify() once
@@ -74,7 +74,7 @@ function buildScript(file, watch) {
   Styles Task
 */
 
-gulp.task('styles', function() {
+gulp.task('styles', () => {
   gulp.src('./styles/**/*.scss')
     .pipe(sass({
       outputStyle: 'compressed'
@@ -89,7 +89,7 @@ gulp.task('styles', function() {
 /*
   Copy over assets
 */
-gulp.task('assets',function(){
+gulp.task('assets', () => {
   gulp.src('./assets/**')
     .pipe(gulp.dest('./build/assets/'))
 });
@@ -97,7 +97,7 @@ gulp.task('assets',function(){
 /*
   Browser Sync
 */
-gulp.task('browser-sync', function() {
+gulp.task('browser-sync', () => {
   browserSync({
     server : {},
     middleware : [ historyApiFallback() ],
@@ -105,18 +105,18 @@ gulp.task('browser-sync', function() {
   });
 });
 
-gulp.task('scripts', function() {
+gulp.task('scripts', () => {
   return buildScript('main.js', false); // this will run once because we set watch to false
 });
 
 /*
  * Instrument files using istanbul and isparta
  */
-gulp.task('coverage:instrument', function() {
+gulp.task('coverage:instrument', () => {
   return gulp.src(SRC_FILES)
     .pipe(istanbul({
       instrumenter: Instrumenter, // Use the isparta instrumenter (code coverage for ES6)
-      babel: {presets: ["stage-0", "es2015", "react"]}
+      babel: {presets: BABEL_PRESETS}
       // Istanbul configuration (see https://github.com/SBoudrias/gulp-istanbul#istanbulopt)
       // ...
     }))
@@ -126,7 +126,7 @@ gulp.task('coverage:instrument', function() {
 /*
  * Write coverage reports after test success
  */
-gulp.task('coverage:report', function(done) {
+gulp.task('coverage:report', (done) => {
   return gulp.src(SRC_FILES, {read: false})
     .pipe(istanbul.writeReports({
       // Istanbul configuration (see https://github.com/SBoudrias/gulp-istanbul#istanbulwritereportsopt)
@@ -137,7 +137,7 @@ gulp.task('coverage:report', function(done) {
 /**
  * Run unit tests
  */
-gulp.task('test', function() {
+gulp.task('test', () => {
   return gulp.src(TEST_FILES, {read: false})
     .pipe(mocha({
       compilers: { js: babel },
@@ -148,14 +148,14 @@ gulp.task('test', function() {
 /**
  * Run unit tests with code coverage
  */
-gulp.task('test:coverage', function(done) {
+gulp.task('test:coverage', (done) => {
   runSequence('coverage:instrument', 'test', 'coverage:report', done);
 });
 
 /**
  * Watch files and run unit tests on changes
  */
-gulp.task('tdd', function(done) {
+gulp.task('tdd', (done) => {
   gulp.watch([
     TEST_FILES,
     SRC_FILES
@@ -163,7 +163,7 @@ gulp.task('tdd', function(done) {
 });
 
 // run 'scripts' task first, then watch for future changes
-gulp.task('default', ['assets','styles','scripts','browser-sync'], function() {
+gulp.task('default', ['assets','styles','scripts','browser-sync'], () => {
   gulp.watch('styles/**/*', ['styles']); // gulp watch for stylus changes
   return buildScript('main.js', true); // browserify watch for JS changes
 });
