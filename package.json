@@ -1,8 +1,8 @@
 {
-  "name": "holiday-card-2015",
+  "name": "react-seed",
   "version": "1.0.0",
   "author": "Tenet Partners",
-  "license": "ISC",
+  "license": "MIT",
   "babel": {
     "presets": ["es2015"]
   },
