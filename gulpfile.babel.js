@@ -1,32 +1,31 @@
-var source = require('vinyl-source-stream');
-var gulp = require('gulp');
-var gutil = require('gulp-util');
-var browserify = require('browserify');
-var babel = require('babel/register')({
-  stage : 0 // to use ES7 experimental features
-});
-var babelify = require('babelify');
-var watchify = require('watchify');
-var notify = require('gulp-notify');
+import gulp from 'gulp'
+import source from 'vinyl-source-stream'
+import gutil from 'gulp-util'
+import browserify from 'browserify'
+import babel from 'babel-core/register'
+babel({ presets: ["stage-0", "es2015", "react"] })
+import babelify from 'babelify'
+import watchify from 'watchify'
+import notify from 'gulp-notify'
 
-var sass = require('gulp-sass');
-var autoprefixer = require('gulp-autoprefixer');
-var uglify = require('gulp-uglify');
-var rename = require('gulp-rename');
-var buffer = require('vinyl-buffer');
+import sass from 'gulp-sass'
+import autoprefixer from 'gulp-autoprefixer'
+import uglify from 'gulp-uglify'
+import rename from 'gulp-rename'
+import buffer from 'vinyl-buffer'
 
-var browserSync = require('browser-sync');
-var reload = browserSync.reload;
-var historyApiFallback = require('connect-history-api-fallback')
+import browserSync from 'browser-sync'
+let reload = browserSync.reload;
+import historyApiFallback from 'connect-history-api-fallback'
 
-var mocha = require('gulp-mocha');
-var istanbul = require('gulp-istanbul');
-var isparta = require('isparta');
-var runSequence = require('run-sequence');
+import mocha from 'gulp-mocha'
+import istanbul from 'gulp-istanbul'
+import { Instrumenter } from 'isparta'
+import runSequence from 'run-sequence'
 
 // Files to process
-var TEST_FILES = 'scripts/**/__tests__/**/*.js';
-var SRC_FILES = 'scripts/**/*.js';
+let TEST_FILES = 'scripts/**/__tests__/**/*.js';
+let SRC_FILES = 'scripts/**/*.js';
 
 function handleErrors() {
   var args = Array.prototype.slice.call(arguments);
@@ -41,7 +40,7 @@ function buildScript(file, watch) {
   var props = {
     entries: ['./scripts/' + file],
     debug : true,
-    transform:  [babelify.configure({stage : 0 })]
+    transform:  [babelify.configure({presets: ["stage-0", "es2015", "react"]})]
   };
 
   // watchify() if watch requested, otherwise run browserify() once
@@ -75,20 +74,6 @@ function buildScript(file, watch) {
   Styles Task
 */
 
-// gulp.task('styles',function() {
-//   // move over fonts
-//
-//   gulp.src('css/fonts/**.*')
-//     .pipe(gulp.dest('build/css/fonts'))
-//
-//   // Compiles CSS
-//   gulp.src('css/style.styl')
-//     .pipe(stylus())
-//     .pipe(autoprefixer())
-//     .pipe(gulp.dest('./build/css/'))
-//     .pipe(reload({stream:true}))
-// });
-
 gulp.task('styles', function() {
   gulp.src('./styles/**/*.scss')
     .pipe(sass({
@@ -96,8 +81,8 @@ gulp.task('styles', function() {
     }))
     .on('error', handleErrors)
     .pipe(autoprefixer('last 2 version', 'safari 5', 'ie 9', 'ff 17', 'opera 12.1', 'ios 6', 'android 4'))
-    // .on('error', continueOnError)
-    .pipe(gulp.dest('./build/assets/'))
+    .on('error', handleErrors)
+    .pipe(gulp.dest('./build/'))
     .pipe(reload({stream:true}))
 });
 
@@ -130,8 +115,8 @@ gulp.task('scripts', function() {
 gulp.task('coverage:instrument', function() {
   return gulp.src(SRC_FILES)
     .pipe(istanbul({
-      instrumenter: isparta.Instrumenter, // Use the isparta instrumenter (code coverage for ES6)
-      // babel: {stage : 0}
+      instrumenter: Instrumenter, // Use the isparta instrumenter (code coverage for ES6)
+      babel: {presets: ["stage-0", "es2015", "react"]}
       // Istanbul configuration (see https://github.com/SBoudrias/gulp-istanbul#istanbulopt)
       // ...
     }))
