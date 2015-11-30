@@ -8,6 +8,7 @@ import gutil from 'gulp-util'
 import browserify from 'browserify'
 import babel from 'babel-core/register'
 babel({ presets: BABEL_PRESETS })
+import eslint from 'gulp-eslint'
 import babelify from 'babelify'
 import watchify from 'watchify'
 import notify from 'gulp-notify'
@@ -109,6 +110,33 @@ gulp.task('scripts', () => {
   return buildScript('main.js', false); // this will run once because we set watch to false
 });
 
+gulp.task('eslint', function() {
+  return gulp.src(SRC_FILES)
+    .pipe(eslint({
+      baseConfig: {
+        "env": {
+          "browser": true,
+          "node": true,
+          "mocha": true,
+          "es6": true
+        },
+        "ecmaFeatures": {
+          "modules": true,
+          "jsx": true
+        },
+        "extends": "eslint:recommended",
+        "plugins": [
+          "react"
+        ],
+        "rules": {
+          "react/jsx-uses-react": 2
+        }
+      }
+    }))
+    .pipe(eslint.format());
+    // .pipe(eslint.failAfterError());
+});
+
 /*
  * Instrument files using istanbul and isparta
  */
@@ -163,7 +191,8 @@ gulp.task('tdd', (done) => {
 });
 
 // run 'scripts' task first, then watch for future changes
-gulp.task('default', ['assets','styles','scripts','browser-sync'], () => {
+gulp.task('default', ['assets','styles','eslint','scripts','browser-sync'], () => {
   gulp.watch('styles/**/*', ['styles']); // gulp watch for stylus changes
+  gulp.watch(SRC_FILES, ['eslint']);
   return buildScript('main.js', true); // browserify watch for JS changes
 });
