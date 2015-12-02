@@ -36,6 +36,7 @@
     "install": "^0.3.0",
     "isparta": "^4.0.0",
     "jsdom": "^7.0.2",
+    "localStorage": "^1.0.3",
     "mocha": "^2.3.4",
     "re-base": "^1.2.1",
     "react": "^0.14.0",
