@@ -184,6 +184,7 @@ gulp.task('test:coverage', (done) => {
  * Watch files and run unit tests on changes
  */
 gulp.task('tdd', (done) => {
+  gulp.watch(SRC_FILES, ['eslint']);
   gulp.watch([
     TEST_FILES,
     SRC_FILES
